@@ -2,6 +2,10 @@
 
 A comprehensive full-stack event management application built with the MERN stack (MongoDB, Express.js, React, Node.js). Create events, manage RSVPs, and connect with your community in real-time.
 
+## 📱 Live Application
+**Frontend URL:** [Your Netlify Link Here]
+**Backend API:** [Your Railway/Render Link Here]
+
 ## ✨ Features
 
 ### 🎯 Core Functionality
