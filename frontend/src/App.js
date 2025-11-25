@@ -1,14 +1,14 @@
-﻿import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
-import "./App.css";
-import Navbar from "./components/Navbar";
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import CreateEvent from "./pages/CreateEvent";
-import EventDetail from "./pages/EventDetail";
-import MyRSVPs from "./pages/MyRSVPs";
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import './App.css';
+import Navbar from './components/Navbar';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import CreateEvent from './pages/CreateEvent';
+import EventDetail from './pages/EventDetail';
+import MyRSVPs from './pages/MyRSVPs';
 
 function App() {
   return (
