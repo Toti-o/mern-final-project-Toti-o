@@ -1,18 +1,18 @@
-﻿import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { createEvent } from "../services/api";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { createEvent } from '../services/api';
 
 const CreateEvent = () => {
   const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    date: "",
-    location: "",
-    category: "Business",
-    maxAttendees: ""
+    title: '',
+    description: '',
+    date: '',
+    location: '',
+    category: 'Social',
+    maxAttendees: ''
   });
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
   const { user } = useAuth();
@@ -28,13 +28,13 @@ const CreateEvent = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
+    setError('');
 
     try {
       await createEvent(formData);
-      navigate("/");
+      navigate('/');
     } catch (error) {
-      setError(error.response?.data?.message || "Failed to create event");
+      setError(error.response?.data?.message || 'Failed to create event');
     } finally {
       setLoading(false);
     }
@@ -108,10 +108,11 @@ const CreateEvent = () => {
             onChange={handleChange}
             required
           >
-            <option value="Business">Business</option>
             <option value="Social">Social</option>
-            <option value="Training">Training</option>
-            <option value="Team Building">Team Building</option>
+            <option value="Business">Business</option>
+            <option value="Educational">Educational</option>
+            <option value="Sports">Sports</option>
+            <option value="Other">Other</option>
           </select>
         </div>
         
@@ -131,7 +132,7 @@ const CreateEvent = () => {
           className="btn btn-primary"
           disabled={loading}
         >
-          {loading ? "Creating Event..." : "Create Event"}
+          {loading ? 'Creating Event...' : 'Create Event'}
         </button>
       </form>
     </div>
