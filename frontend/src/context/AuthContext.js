@@ -1,4 +1,4 @@
-﻿import React, { createContext, useState, useContext, useEffect } from "react";
+import React, { createContext, useState, useContext, useEffect } from "react";
 import { getCurrentUser } from "../services/api";
 
 const AuthContext = createContext();
@@ -15,10 +15,6 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
   const checkAuth = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -33,6 +29,11 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    checkAuth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const login = (userData, token) => {
     setUser(userData);
