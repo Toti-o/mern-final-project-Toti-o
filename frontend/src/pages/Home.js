@@ -1,31 +1,31 @@
-﻿import React, { useState, useEffect } from "react";
-import { fetchEvents } from "../services/api";
-import EventCard from "../components/EventCard";
+import React, { useState, useEffect, useCallback } from 'react';
+import { fetchEvents } from '../services/api';
+import EventCard from '../components/EventCard';
 
 const Home = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  useEffect(() => {
-    loadEvents();
-  }, [currentPage]);
-
-  const loadEvents = async () => {
+  const loadEvents = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetchEvents(currentPage);
       setEvents(response.data.events);
       setTotalPages(response.data.totalPages);
     } catch (error) {
-      setError("Failed to load events");
-      console.error("Error loading events:", error);
+      setError('Failed to load events');
+      console.error('Error loading events:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage]);
+
+  useEffect(() => {
+    loadEvents();
+  }, [loadEvents]);
 
   if (loading) return <div className="loading">Loading events...</div>;
 
