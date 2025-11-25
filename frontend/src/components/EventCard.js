@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 
 const EventCard = ({ event }) => {
@@ -19,9 +19,9 @@ const EventCard = ({ event }) => {
         <h3>{event.title}</h3>
         <span className="event-category">{event.category}</span>
       </div>
-      
+
       <p className="event-description">{event.description}</p>
-      
+
       <div className="event-details">
         <div className="event-date">
           <strong>📅</strong> {formatDate(event.date)}
@@ -33,7 +33,7 @@ const EventCard = ({ event }) => {
           <strong>👤</strong> Hosted by {event.creator?.name}
         </div>
       </div>
-      
+
       <Link to={`/event/${event._id}`} className="view-details-btn">
         View Details & RSVP
       </Link>
