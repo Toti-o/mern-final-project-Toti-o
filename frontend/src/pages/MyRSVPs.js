@@ -1,12 +1,12 @@
-﻿import React, { useState, useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
-import { fetchMyRSVPs } from "../services/api";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { fetchMyRSVPs } from '../services/api';
+import { Link } from 'react-router-dom';
 
 const MyRSVPs = () => {
   const [rsvps, setRsvps] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   
   const { user } = useAuth();
 
@@ -22,8 +22,8 @@ const MyRSVPs = () => {
       const response = await fetchMyRSVPs();
       setRsvps(response.data);
     } catch (error) {
-      setError("Failed to load your RSVPs");
-      console.error("Error loading RSVPs:", error);
+      setError('Failed to load your RSVPs');
+      console.error('Error loading RSVPs:', error);
     } finally {
       setLoading(false);
     }
@@ -40,12 +40,12 @@ const MyRSVPs = () => {
   if (loading) return <div className="loading">Loading your RSVPs...</div>;
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit"
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     });
   };
 
