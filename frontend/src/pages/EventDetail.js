@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { fetchEvent, createRSVP, fetchEventRSVPs } from "../services/api";
@@ -11,24 +11,44 @@ const EventDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [rsvpLoading, setRsvpLoading] = useState(false);
-  const [socket, setSocket] = useState(null);
-  const [liveUsers, setLiveUsers] = useState(1);
   
   const { id } = useParams();
   const { user } = useAuth();
+
+  const loadEvent = useCallback(async () => {
+    try {
+      setLoading(true);
+      const [eventResponse, rsvpsResponse] = await Promise.all([
+        fetchEvent(id),
+        fetchEventRSVPs(id)
+      ]);
+      
+      setEvent(eventResponse.data.event);
+      setRsvps(rsvpsResponse.data);
+      
+      if (user) {
+        const userRsvp = rsvpsResponse.data.find(rsvp => rsvp.user._id === user.id);
+        setUserRSVP(userRsvp);
+      }
+    } catch (error) {
+      setError("Failed to load event details");
+      console.error("Error loading event:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [id, user]);
 
   useEffect(() => {
     loadEvent();
     
     // Initialize Socket.io connection
-    const newSocket = io(process.env.REACT_APP_API_URL || "http://localhost:5000");
-    setSocket(newSocket);
+    const socket = io(process.env.REACT_APP_API_URL || "http://localhost:5000");
 
     // Join the event room for real-time updates
-    newSocket.emit("join-event", id);
+    socket.emit("join-event", id);
 
     // Listen for real-time RSVP updates
-    newSocket.on("rsvp-update", (data) => {
+    socket.on("rsvp-update", (data) => {
       console.log("🔔 Real-time RSVP update:", data);
       
       if (data.eventId === id) {
@@ -55,10 +75,10 @@ const EventDetail = () => {
 
     // Cleanup on component unmount
     return () => {
-      newSocket.emit("leave-event", id);
-      newSocket.disconnect();
+      socket.emit("leave-event", id);
+      socket.disconnect();
     };
-  }, [id, user]);
+  }, [id, user, loadEvent]);
 
   const showNotification = (message) => {
     // Create a temporary notification
@@ -82,29 +102,6 @@ const EventDetail = () => {
     setTimeout(() => {
       document.body.removeChild(notification);
     }, 5000);
-  };
-
-  const loadEvent = async () => {
-    try {
-      setLoading(true);
-      const [eventResponse, rsvpsResponse] = await Promise.all([
-        fetchEvent(id),
-        fetchEventRSVPs(id)
-      ]);
-      
-      setEvent(eventResponse.data.event);
-      setRsvps(rsvpsResponse.data);
-      
-      if (user) {
-        const userRsvp = rsvpsResponse.data.find(rsvp => rsvp.user._id === user.id);
-        setUserRSVP(userRsvp);
-      }
-    } catch (error) {
-      setError("Failed to load event details");
-      console.error("Error loading event:", error);
-    } finally {
-      setLoading(false);
-    }
   };
 
   const handleRSVP = async (response) => {
