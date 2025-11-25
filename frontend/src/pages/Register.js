@@ -1,16 +1,16 @@
-﻿import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { register } from "../services/api";
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { register } from '../services/api';
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: ""
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
   });
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
   const { login: authLogin } = useAuth();
@@ -26,10 +26,10 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
+    setError('');
 
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
+      setError('Passwords do not match');
       setLoading(false);
       return;
     }
@@ -38,9 +38,9 @@ const Register = () => {
       const { confirmPassword, ...registerData } = formData;
       const response = await register(registerData);
       authLogin(response.data.user, response.data.token);
-      navigate("/");
+      navigate('/');
     } catch (error) {
-      setError(error.response?.data?.message || "Registration failed. Please try again.");
+      setError(error.response?.data?.message || 'Registration failed');
     } finally {
       setLoading(false);
     }
@@ -103,11 +103,11 @@ const Register = () => {
           className="btn btn-primary"
           disabled={loading}
         >
-          {loading ? "Creating Account..." : "Register"}
+          {loading ? 'Creating Account...' : 'Register'}
         </button>
       </form>
       
-      <p style={{ marginTop: "1rem", textAlign: "center" }}>
+      <p style={{ marginTop: '1rem', textAlign: 'center' }}>
         Already have an account? <Link to="/login">Login here</Link>
       </p>
     </div>
