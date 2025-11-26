@@ -1,15 +1,21 @@
-﻿{
-  "name": "event-rsvp-app",
-  "version": "1.0.0",
-  "description": "Event Management Platform - MERN Stack Capstone Project",
-  "scripts": {
-    "build": "cd frontend && npm run build",
-    "install-client": "cd frontend && npm install",
-    "install-server": "cd backend && npm install",
-    "install-all": "npm run install-client && npm run install-server",
-    "dev": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm start\""
-  },
-  "keywords": ["mern", "react", "node", "mongodb", "capstone"],
-  "author": "Your Name",
-  "license": "MIT"
+{
+    "name":  "event-rsvp-app",
+    "version":  "1.0.0",
+    "description":  "Event Management Platform - MERN Stack Capstone Project",
+    "scripts":  {
+                    "build":  "cd frontend \u0026\u0026 react-scripts build",
+                    "install-client":  "cd frontend \u0026\u0026 npm install",
+                    "install-server":  "cd backend \u0026\u0026 npm install",
+                    "install-all":  "npm run install-client \u0026\u0026 npm run install-server",
+                    "dev":  "concurrently \"cd backend \u0026\u0026 npm run dev\" \"cd frontend \u0026\u0026 npm start\""
+                },
+    "keywords":  [
+                     "mern",
+                     "react",
+                     "node",
+                     "mongodb",
+                     "capstone"
+                 ],
+    "author":  "Your Name",
+    "license":  "MIT"
 }
