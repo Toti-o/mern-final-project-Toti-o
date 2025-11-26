@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { fetchEvents } from "../services/api";
 import EventCard from "../components/EventCard";
 
