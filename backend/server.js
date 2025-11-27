@@ -3,13 +3,12 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const { createServer } = require("http");
 const { Server } = require("socket.io");
-const path = require("path");
-require("dotenv").config();
+require("dotenv").config(); // Remove path import - not needed
 
 const app = express();
 const httpServer = createServer(app);
 
-// ✅ FIXED CORS MIDDLEWARE
+// ✅ CORS Middleware
 app.use(cors({
   origin: [
     process.env.CLIENT_URL || "https://mernevent.netlify.app",
@@ -19,7 +18,7 @@ app.use(cors({
   methods: ["GET", "POST", "PUT", "DELETE"]
 }));
 
-// ✅ Socket.io setup (fixed - removed trailing slash)
+// ✅ Socket.io setup
 const io = new Server(httpServer, {
   cors: {
     origin: process.env.CLIENT_URL || "https://mernevent.netlify.app",     
@@ -50,17 +49,22 @@ mongoose.connect(process.env.MONGODB_URI)
       });
     });
 
-    // Serve static files in production
-    if (process.env.NODE_ENV === "production") {
-      app.use(express.static(path.join(__dirname, "../frontend/build")));
-    }
-
-    // Serve React app in production
-    if (process.env.NODE_ENV === "production") {
-      app.get("*", (req, res) => {
-        res.sendFile(path.join(__dirname, "../frontend/build", "index.html"));
+    // ✅ REMOVED: Frontend static file serving (causing errors)
+    // ✅ ADDED: API root endpoint instead
+    app.get("/", (req, res) => {
+      res.json({
+        message: "Event RSVP API Server",
+        status: "Running",
+        version: "1.0.0",
+        endpoints: {
+          health: "/api/health",
+          auth: "/api/auth",
+          events: "/api/events", 
+          rsvps: "/api/rsvps"
+        },
+        frontend: "Deployed separately on Netlify"
       });
-    }
+    });
 
     // Socket.io for real-time updates
     io.on("connection", (socket) => {
@@ -83,6 +87,7 @@ mongoose.connect(process.env.MONGODB_URI)
     httpServer.listen(PORT, () => {
       console.log("🚀 Server running on port " + PORT);
       console.log("📊 MongoDB status: Connected");
+      console.log("🌐 Frontend: Deployed separately on Netlify");
     });
   })
   .catch(err => {
