@@ -1,4 +1,4 @@
-﻿const express = require("express");
+const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const { createServer } = require("http");
@@ -9,16 +9,25 @@ require("dotenv").config();
 const app = express();
 const httpServer = createServer(app);
 
-// Socket.io setup
+// ✅ FIXED CORS MIDDLEWARE
+app.use(cors({
+  origin: [
+    process.env.CLIENT_URL || "https://mernevent.netlify.app",
+    "http://localhost:3000"
+  ],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE"]
+}));
+
+// ✅ Socket.io setup (fixed - removed trailing slash)
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:3000",     
+    origin: process.env.CLIENT_URL || "https://mernevent.netlify.app",     
     methods: ["GET", "POST"]
   }
 });
 
 // Middleware
-app.use(cors());
 app.use(express.json());
 
 // MongoDB Connection
