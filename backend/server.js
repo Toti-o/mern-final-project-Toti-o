@@ -3,26 +3,33 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const { createServer } = require("http");
 const { Server } = require("socket.io");
-require("dotenv").config(); // Remove path import - not needed
+require("dotenv").config();
 
 const app = express();
 const httpServer = createServer(app);
 
-// ✅ CORS Middleware
-app.use(cors({
+// ✅ FIXED CORS CONFIGURATION
+const corsOptions = {
   origin: [
-    process.env.CLIENT_URL || "https://mernevent.netlify.app",
+    "https://mernevent.netlify.app",
     "http://localhost:3000"
   ],
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE"]
-}));
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "Accept"]
+};
+
+app.use(cors(corsOptions));
+
+// Handle preflight requests explicitly
+app.options('*', cors(corsOptions));
 
 // ✅ Socket.io setup
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.CLIENT_URL || "https://mernevent.netlify.app",     
-    methods: ["GET", "POST"]
+    origin: "https://mernevent.netlify.app",     
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
@@ -49,8 +56,7 @@ mongoose.connect(process.env.MONGODB_URI)
       });
     });
 
-    // ✅ REMOVED: Frontend static file serving (causing errors)
-    // ✅ ADDED: API root endpoint instead
+    // API root endpoint
     app.get("/", (req, res) => {
       res.json({
         message: "Event RSVP API Server",
@@ -87,7 +93,7 @@ mongoose.connect(process.env.MONGODB_URI)
     httpServer.listen(PORT, () => {
       console.log("🚀 Server running on port " + PORT);
       console.log("📊 MongoDB status: Connected");
-      console.log("🌐 Frontend: Deployed separately on Netlify");
+      console.log("🌐 CORS enabled for: https://mernevent.netlify.app");
     });
   })
   .catch(err => {
