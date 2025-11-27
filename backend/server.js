@@ -3,101 +3,90 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const { createServer } = require("http");
 const { Server } = require("socket.io");
+const path = require("path");
 require("dotenv").config();
 
 const app = express();
 const httpServer = createServer(app);
 
-// ✅ FIXED CORS CONFIGURATION
-const corsOptions = {
-  origin: [
-    "https://mernevent.netlify.app",
-    "http://localhost:3000"
-  ],
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "Accept"]
-};
-
-app.use(cors(corsOptions));
-
-// Handle preflight requests explicitly
-app.options('*', cors(corsOptions));
-
-// ✅ Socket.io setup
+// Socket.io setup for production
 const io = new Server(httpServer, {
   cors: {
-    origin: "https://mernevent.netlify.app",     
-    methods: ["GET", "POST"],
-    credentials: true
+    origin: process.env.CLIENT_URL || "http://localhost:3000",     
+    methods: ["GET", "POST"]
   }
 });
 
-// Middleware
+// Middleware - updated CORS for production
+app.use(cors({
+  origin: process.env.CLIENT_URL || "http://localhost:3000",
+  credentials: true
+}));
 app.use(express.json());
 
-// MongoDB Connection
-console.log("🔄 Testing MongoDB connection...");
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => {
-    console.log("✅ MongoDB Connected Successfully!");
+// MongoDB Connection - simplified for production
+const connectDB = async () => {
+  try {
+    console.log('🔄 Connecting to MongoDB...');
     
-    // Routes - only load after DB connects
-    app.use("/api/events", require("./routes/events"));
-    app.use("/api/auth", require("./routes/auth")); 
-    app.use("/api/rsvps", require("./routes/rsvps"));
+    const conn = await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 30000,
+      socketTimeoutMS: 45000,
+    });
+
+    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+    console.log(`✅ Database: ${conn.connection.name}`);
     
-    // Health check
-    app.get("/api/health", (req, res) => {
-      res.json({ 
-        status: "OK",
-        database: "Connected",
-        timestamp: new Date().toISOString()
-      });
-    });
-
-    // API root endpoint
-    app.get("/", (req, res) => {
-      res.json({
-        message: "Event RSVP API Server",
-        status: "Running",
-        version: "1.0.0",
-        endpoints: {
-          health: "/api/health",
-          auth: "/api/auth",
-          events: "/api/events", 
-          rsvps: "/api/rsvps"
-        },
-        frontend: "Deployed separately on Netlify"
-      });
-    });
-
-    // Socket.io for real-time updates
-    io.on("connection", (socket) => {
-      console.log("User connected:", socket.id);
-      
-      socket.on("join-event", (eventId) => {
-        socket.join(eventId);
-      });
-      
-      socket.on("new-rsvp", (data) => {
-        socket.to(data.eventId).emit("rsvp-update", data);
-      });
-      
-      socket.on("disconnect", () => {
-        console.log("User disconnected:", socket.id);
-      });
-    });
-
-    const PORT = process.env.PORT || 5000;
-    httpServer.listen(PORT, () => {
-      console.log("🚀 Server running on port " + PORT);
-      console.log("📊 MongoDB status: Connected");
-      console.log("🌐 CORS enabled for: https://mernevent.netlify.app");
-    });
-  })
-  .catch(err => {
-    console.log("❌ MongoDB Connection Failed:");
-    console.log("Error:", err.message);
+    return conn;
+  } catch (error) {
+    console.log('❌ MongoDB connection failed:');
+    console.log('Error:', error.message);
     process.exit(1);
+  }
+};
+
+// Routes
+app.use('/api/events', require('./routes/events'));
+app.use('/api/rsvps', require('./routes/rsvps'));
+app.use('/api/auth', require('./routes/auth'));
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'OK',
+    database: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected',
+    timestamp: new Date().toISOString()
   });
+});
+
+// Serve static files from frontend build in production
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/build")));
+  
+  // Serve React app for all other routes
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend/build", "index.html"));
+  });
+}
+
+// Socket.io for real-time updates
+io.on('connection', (socket) => {
+  console.log('User connected:', socket.id);
+  socket.on('join-event', (eventId) => socket.join(eventId));
+  socket.on('new-rsvp', (data) => socket.to(data.eventId).emit('rsvp-update', data));
+  socket.on('disconnect', () => console.log('User disconnected:', socket.id));
+});
+
+// Start server
+const startServer = async () => {
+  await connectDB();
+  const PORT = process.env.PORT || 5000;
+  httpServer.listen(PORT, () => {
+    console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+    console.log(`🌐 Health check: http://localhost:${PORT}/api/health`);
+  });
+};
+
+startServer();
