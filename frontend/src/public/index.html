@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#6366f1" />
+    
+    <!-- Primary Meta Tags -->
+    <meta name="title" content="EventFlow HR - Modern Event Management" />
+    <meta
+      name="description"
+      content="Streamline corporate event management and employee engagement with EventFlow HR. Create, manage, and track events with real-time RSVPs."
+    />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://yourapp.com/" />
+    <meta property="og:title" content="EventFlow HR - Modern Event Management" />
+    <meta property="og:description" content="Streamline corporate event management and employee engagement with EventFlow HR." />
+    <meta property="og:image" content="%PUBLIC_URL%/social-preview.png" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://yourapp.com/" />
+    <meta property="twitter:title" content="EventFlow HR - Modern Event Management" />
+    <meta property="twitter:description" content="Streamline corporate event management and employee engagement with EventFlow HR." />
+    <meta property="twitter:image" content="%PUBLIC_URL%/social-preview.png" />
+
+    <!-- Preconnect to important third-party origins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Modern Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    
+    <!-- Safari Pinned Tab Color -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="EventFlow HR">
+    
+    <!-- Microsoft Tiles -->
+    <meta name="msapplication-TileColor" content="#6366f1">
+    <meta name="msapplication-TileImage" content="%PUBLIC_URL%/mstile-144x144.png">
+    
+    <!-- Modern App Title -->
+    <title>EventFlow HR | Modern Event Management Platform</title>
+
+    <style>
+      /* Loading animation for better perceived performance */
+      #root {
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+      }
+      
+      .loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-family: 'Inter', sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>
+      <div style="padding: 2rem; text-align: center; font-family: sans-serif;">
+        <h1>JavaScript Required</h1>
+        <p>You need to enable JavaScript to run EventFlow HR. This is a modern web application that requires JavaScript for the best experience.</p>
+      </div>
+    </noscript>
+    
+    <!-- Loading state for better UX -->
+    <div id="loading" class="loading">
+      <div style="text-align: center;">
+        <div style="width: 48px; height: 48px; border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid white; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
+        <p>Loading EventFlow HR...</p>
+      </div>
+    </div>
+    
+    <div id="root"></div>
+
+    <script>
+      // Simple loading state management
+      window.addEventListener('load', function() {
+        const loading = document.getElementById('loading');
+        const root = document.getElementById('root');
+        
+        if (loading && root) {
+          // Show the React app and hide loading
+          root.style.opacity = '1';
+          loading.style.display = 'none';
+        }
+      });
+
+      // Fallback in case React takes too long
+      setTimeout(function() {
+        const loading = document.getElementById('loading');
+        const root = document.getElementById('root');
+        
+        if (loading && root) {
+          root.style.opacity = '1';
+          loading.style.display = 'none';
+        }
+      }, 3000);
+    </script>
+
+    <style>
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+  </body>
+</html>
