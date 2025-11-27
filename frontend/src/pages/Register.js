@@ -35,11 +35,27 @@ const Register = () => {
     }
 
     try {
+      console.log("🔄 Starting registration...");
       const { confirmPassword, ...registerData } = formData;
+      console.log("Sending data:", registerData);
+      
       const response = await register(registerData);
+      console.log("✅ Registration API response:", response);
+      
+      // Debug: Check the response structure
+      console.log("Response data:", response.data);
+      console.log("Response status:", response.status);
+      
       authLogin(response.data.user, response.data.token);
+      console.log("✅ Auth context updated");
+      
       navigate("/");
     } catch (error) {
+      console.log("❌ Registration error details:");
+      console.log("Error object:", error);
+      console.log("Error response:", error.response);
+      console.log("Error message:", error.message);
+      
       setError(error.response?.data?.message || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
