@@ -9,19 +9,38 @@ require("dotenv").config();
 const app = express();
 const httpServer = createServer(app);
 
-// Socket.io setup for production
+// ✅ FIXED CORS ORIGINS - Added https:// protocol
+const allowedOrigins = [
+  "https://mernevent.netlify.app",  // Fixed: added https://
+  "http://localhost:3000"
+];
+
+// ✅ FIXED CORS Middleware
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+}));
+
+// ✅ FIXED Socket.io setup
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:3000",     
-    methods: ["GET", "POST"]
+    origin: "https://mernevent.netlify.app",  // Fixed: added https://
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
-// Middleware - updated CORS for production
-app.use(cors({
-  origin: process.env.CLIENT_URL || "http://localhost:3000",
-  credentials: true
-}));
+// Middleware
 app.use(express.json());
 
 // MongoDB Connection - simplified for production
@@ -61,15 +80,21 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Serve static files from frontend build in production
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../frontend/build")));
-  
-  // Serve React app for all other routes
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../frontend/build", "index.html"));
+// ✅ REMOVED: Frontend static file serving (not needed on Render)
+// ✅ ADDED: API root endpoint
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Event RSVP API Server',
+    status: 'Running',
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth',
+      events: '/api/events',
+      rsvps: '/api/rsvps'
+    }
   });
-}
+});
 
 // Socket.io for real-time updates
 io.on('connection', (socket) => {
@@ -85,7 +110,7 @@ const startServer = async () => {
   const PORT = process.env.PORT || 5000;
   httpServer.listen(PORT, () => {
     console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-    console.log(`🌐 Health check: http://localhost:${PORT}/api/health`);
+    console.log(`🌐 CORS enabled for: ${allowedOrigins.join(', ')}`);
   });
 };
 
