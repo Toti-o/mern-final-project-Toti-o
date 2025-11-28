@@ -3,6 +3,8 @@
 
 https://mernevent.netlify.app/
 
+Render : https://eventflow-u7tx.onrender.com
+
 Demo video https://drive.google.com/file/d/153oNbB-GnQSCHAsaoFPb5O2HUIXjNQ2J/view?usp=sharing
 
 A comprehensive full-stack event management application built with the MERN stack (MongoDB, Express.js, React, Node.js). Create events, manage RSVPs, and connect with your community in real-time.
@@ -303,6 +305,7 @@ I welcome contributions! Please follow these steps:
 3. Commit your changes: `git commit -m 'Add amazing feature'`
 4. Push to the branch: `git push origin feature/amazing-feature`
 5. Open a Pull Request
+
 
 
 
