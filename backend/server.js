@@ -40,6 +40,9 @@ const io = new Server(httpServer, {
   }
 });
 
+// ✅ SET Socket.io instance for use in routes
+app.set('io', io);
+
 // Middleware
 app.use(express.json());
 
@@ -96,12 +99,30 @@ app.get('/', (req, res) => {
   });
 });
 
-// Socket.io for real-time updates
+// ✅ IMPROVED Socket.io for real-time updates with null checks
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
-  socket.on('join-event', (eventId) => socket.join(eventId));
-  socket.on('new-rsvp', (data) => socket.to(data.eventId).emit('rsvp-update', data));
-  socket.on('disconnect', () => console.log('User disconnected:', socket.id));
+  
+  socket.on('join-event', (eventId) => {
+    if (eventId && socket) {
+      socket.join(eventId);
+      console.log(`User ${socket.id} joined event ${eventId}`);
+    }
+  });
+  
+  socket.on('new-rsvp', (data) => {
+    // Add null checks to prevent "Cannot read properties of undefined" error
+    if (data && data.eventId && socket) {
+      console.log('New RSVP received:', data);
+      socket.to(data.eventId).emit('rsvp-update', data);
+    } else {
+      console.log('Invalid RSVP data or socket not available:', data);
+    }
+  });
+  
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+  });
 });
 
 // Start server
@@ -111,6 +132,7 @@ const startServer = async () => {
   httpServer.listen(PORT, () => {
     console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
     console.log(`🌐 CORS enabled for: ${allowedOrigins.join(', ')}`);
+    console.log(`🔌 Socket.io ready for real-time updates`);
   });
 };
 
