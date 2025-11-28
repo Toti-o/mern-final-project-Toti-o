@@ -19,14 +19,37 @@ const MyRSVPs = () => {
   const loadMyRSVPs = async () => {
     try {
       setLoading(true);
+      console.log("🔄 Loading user RSVPs...");
       const response = await fetchMyRSVPs();
+      console.log("✅ RSVPs loaded:", response.data);
       setRsvps(response.data);
     } catch (error) {
-      setError("Failed to load your RSVPs");
-      console.error("Error loading RSVPs:", error);
+      console.error("❌ Error loading RSVPs:", error);
+      setError(error.response?.data?.message || "Failed to load your RSVPs");
     } finally {
       setLoading(false);
     }
+  };
+
+  // Add safe data access to prevent undefined errors
+  const getEventTitle = (rsvp) => {
+    return rsvp.event?.title || "Unknown Event";
+  };
+
+  const getEventDescription = (rsvp) => {
+    return rsvp.event?.description || "No description available";
+  };
+
+  const getEventDate = (rsvp) => {
+    return rsvp.event?.date || new Date();
+  };
+
+  const getEventLocation = (rsvp) => {
+    return rsvp.event?.location || "Location not specified";
+  };
+
+  const getEventId = (rsvp) => {
+    return rsvp.event?._id || rsvp.event;
   };
 
   if (!user) {
@@ -49,8 +72,8 @@ const MyRSVPs = () => {
     });
   };
 
-  const upcomingRSVPs = rsvps.filter(rsvp => new Date(rsvp.event.date) > new Date());
-  const pastRSVPs = rsvps.filter(rsvp => new Date(rsvp.event.date) <= new Date());
+  const upcomingRSVPs = rsvps.filter(rsvp => new Date(getEventDate(rsvp)) > new Date());
+  const pastRSVPs = rsvps.filter(rsvp => new Date(getEventDate(rsvp)) <= new Date());
 
   return (
     <div className="my-rsvps">
@@ -68,21 +91,21 @@ const MyRSVPs = () => {
               {upcomingRSVPs.map(rsvp => (
                 <div key={rsvp._id} className="event-card">
                   <div className="event-header">
-                    <h3>{rsvp.event.title}</h3>
-                    <span className={`response-${rsvp.response.toLowerCase()}`}>
-                      {rsvp.response}
+                    <h3>{getEventTitle(rsvp)}</h3>
+                    <span className={`response-${rsvp.response?.toLowerCase() || 'unknown'}`}>
+                      {rsvp.response || 'Unknown'}
                     </span>
                   </div>
-                  <p className="event-description">{rsvp.event.description}</p>
+                  <p className="event-description">{getEventDescription(rsvp)}</p>
                   <div className="event-details">
                     <div className="event-date">
-                      <strong>📅</strong> {formatDate(rsvp.event.date)}
+                      <strong>📅</strong> {formatDate(getEventDate(rsvp))}
                     </div>
                     <div className="event-location">
-                      <strong>📍</strong> {rsvp.event.location}
+                      <strong>📍</strong> {getEventLocation(rsvp)}
                     </div>
                   </div>
-                  <Link to={`/event/${rsvp.event._id}`} className="view-details-btn">
+                  <Link to={`/event/${getEventId(rsvp)}`} className="view-details-btn">
                     View Event Details
                   </Link>
                 </div>
@@ -100,18 +123,18 @@ const MyRSVPs = () => {
               {pastRSVPs.map(rsvp => (
                 <div key={rsvp._id} className="event-card past-event">
                   <div className="event-header">
-                    <h3>{rsvp.event.title}</h3>
-                    <span className={`response-${rsvp.response.toLowerCase()}`}>
-                      {rsvp.response}
+                    <h3>{getEventTitle(rsvp)}</h3>
+                    <span className={`response-${rsvp.response?.toLowerCase() || 'unknown'}`}>
+                      {rsvp.response || 'Unknown'}
                     </span>
                   </div>
-                  <p className="event-description">{rsvp.event.description}</p>
+                  <p className="event-description">{getEventDescription(rsvp)}</p>
                   <div className="event-details">
                     <div className="event-date">
-                      <strong>📅</strong> {formatDate(rsvp.event.date)}
+                      <strong>📅</strong> {formatDate(getEventDate(rsvp))}
                     </div>
                     <div className="event-location">
-                      <strong>📍</strong> {rsvp.event.location}
+                      <strong>📍</strong> {getEventLocation(rsvp)}
                     </div>
                   </div>
                   <div className="past-event-label">Past Event</div>
